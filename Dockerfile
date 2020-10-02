@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED 1
 # RUN apt-get update && apt-get install -qq -y \
 #   build-essential libpq-dev --no-install-recommends
 
-ENV INSTALL_PATH /tournament
+ENV INSTALL_PATH /app
 RUN mkdir -p $INSTALL_PATH
 
 
