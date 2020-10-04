@@ -19,4 +19,5 @@ from django.urls import path, include
 urlpatterns = [
     path('tournament/', include('tournament.urls')),
     path('admin/', admin.site.urls),
+    path('tournament/api/', include('tournament.api.urls', 'tournament_api'))
 ]

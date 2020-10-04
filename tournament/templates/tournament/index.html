@@ -20,14 +20,11 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <!-- bootstrap file-->
 
-  <!-- jQuery -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 
   <!-- main css -->
-  <link rel="stylesheet" type="text/css" href="{% static "index.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'index.css' %}" />
 
 
   <!-- message here -->
@@ -59,12 +56,10 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" class="styleheader" href="{% url 'tournament:index' %}">project</a>
+          <a class="navbar-brand" class="styleheader" href="{% url 'tournament:index' %}">Home</a>
         </div>
         <div class="collapse navbar-collapse" id="mainNavBar">
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="{% url 'tournament:index' %}">Home</a></li>
-
             {% if user.is_authenticated %}
             <li><a href="{% url 'tournament:logout' %}"><span class="glyphicon glyphicon-log-out"></span> &nbsp; Logout</a></li>
             {% else %}
@@ -82,20 +77,35 @@
   <br>
   <div class="row">
     {% block start %}
+
     {% if user.is_authenticated %}
     <center><h1>Hello!</h1></center>
+    <!-- <li><a href="{% url 'tournament:opt_in' %}">test</a></li> -->
 
-    <form action="{% url 'tournament:opt_in_tournaments' %}" method="post">
+    <form action="{% url 'tournament:opt_in_tournaments'%}" method="post">
+      <p>You are registered in the following tournaments:
+        {% for tournament in in_tournaments %}
+          <a href= "{% url 'tournament:tournament_page' tournament.id %}">{{ tournament.name }} </a>
+        {% endfor %}
+      </p>
+
+      {% if not out_tournaments %}
+        <p>There are no more tournaments you can join.</p>
       
-      {% csrf_token %}
-      {% for tournament in tournaments %}
-        <input type="checkbox" name="tournament" id="{{ tournamet.slug }}" 
-        value="{{ tournamet.slug }}">
-        <label for="{{tournamet.slug}}">
-          {{ tournament.name }}</label><br>
-      {% endfor %}
-    <input type="submit" value="Opt In">
-    </form>
+      {%else%}
+
+        {% csrf_token %}
+        <p>You can register in the following tournaments:</p>
+        {% for tournament in out_tournaments %}
+          <input type="checkbox" name="tournament" id="tournament{{forloop.counter}}"
+            value="{{ tournament.slug }}">
+          <label for="tournament{{ forloop.counter }}">
+            {{ tournament.name }}
+          </label><br>
+        {% endfor %}
+        <input type="submit" value="Opt In">
+      </form>
+    {% endif %}
 
     {% else %}
     <center><h1>Please login!</h1></center>
