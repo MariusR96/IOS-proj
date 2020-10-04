@@ -1,19 +1,17 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseRedirect
-from .forms import UserRegistrationForm
 from django.urls import reverse
 from django.contrib.auth.models import User
-from rest_framework import viewsets
 from .models import Player, Tournament, Game
-
+from .forms import UserRegistrationForm
 # Create your views here.
 
 def index(request):
     if request.user.is_authenticated:
+        print(request.session.session_key)
         tournaments = Tournament.objects.all()
         current_user = User.objects.get(pk=request.user.id)
         in_tournaments = []
@@ -24,12 +22,7 @@ def index(request):
                 in_tournaments.append(tournament)
             else:
                 out_tournaments.append(tournament)
-            # print(tournament.players.all(), current_user)
-        # key = request.session.session_key
-        # print(key)
-        # for key, value in request.session.items():
-        #     print(key, value)
-        # # print(check_session(request, key))
+
         return render(request, 'tournament/index.html', {'title': 'index',
                         'in_tournaments': in_tournaments,
                         'out_tournaments': out_tournaments})
@@ -74,7 +67,6 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    # key = request.session.session_key
     return redirect(reverse('tournament:index'))
 
 

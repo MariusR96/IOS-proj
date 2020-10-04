@@ -1,12 +1,9 @@
-import datetime 
 from django.db import models
-from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
-from django.conf import settings
 from django.dispatch import receiver
 from django.template.defaultfilters import slugify
 from django.db.models.signals import post_save
-#from rest_framework.authtoken.models import Token
+
 
 class Player(models.Model):
     user = models.OneToOneField(User,
@@ -42,7 +39,7 @@ class Tournament(models.Model):
 
 class Game(models.Model):
     name = name = models.CharField(max_length=50)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, blank=True)
     thumbnail = models.CharField(max_length=50)
     release_date = models.DateTimeField('Release Date')
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
@@ -53,9 +50,3 @@ class Game(models.Model):
 
     def __str__(self):
         return f'{self.name}'
-
-
-# @receiver(post_save, sender=settings.AUTH_USER_MODEL)
-# def create_auth_token(sender, instance=None, created=False, **kwargs):
-#     if created:
-#         Token.objects.create(user=instance)

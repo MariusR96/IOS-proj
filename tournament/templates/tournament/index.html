@@ -13,22 +13,12 @@
 
   <title>{{title}}</title>
 
-
-  <!-- bootstrap file -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <!-- bootstrap file-->
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-
-  <!-- main css -->
   <link rel="stylesheet" type="text/css" href="{% static 'index.css' %}" />
-
-
-  <!-- message here -->
-
   {% if messages %}
   {% for message in messages %}
 
@@ -45,8 +35,6 @@
 
 
   <header class="row">
-
-    <!-- navbar-->
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header">
@@ -79,21 +67,24 @@
     {% block start %}
 
     {% if user.is_authenticated %}
-    <center><h1>Hello!</h1></center>
-    <!-- <li><a href="{% url 'tournament:opt_in' %}">test</a></li> -->
+    <center>
+      <h1>Hello!</h1>
+    </center>
 
-    <form action="{% url 'tournament:opt_in_tournaments'%}" method="post">
-      <p>You are registered in the following tournaments:
-        {% for tournament in in_tournaments %}
-          <a href= "{% url 'tournament:tournament_page' tournament.id %}">{{ tournament.name }} </a>
-        {% endfor %}
-      </p>
-
-      {% if not out_tournaments %}
-        <p>There are no more tournaments you can join.</p>
+    <div class="container sm-margin-top">
+      <div class="row text-center lg-margin-bottom">
+        <form action="{% url 'tournament:opt_in_tournaments'%}" method="post">
+          <p>You are registered in the following tournaments:
+            {% for tournament in in_tournaments %}
+              <a href= "{% url 'tournament:tournament_page' tournament.id %}">{{ tournament.name }} </a>
+            {% endfor %}
+          </p>        
+          {% if not out_tournaments %}
+            <p>There are no more tournaments you can join.</p>
+            {%else%}
+      </div>
       
-      {%else%}
-
+    <div class="row text-center lg-margin-bottom">
         {% csrf_token %}
         <p>You can register in the following tournaments:</p>
         {% for tournament in out_tournaments %}
@@ -105,12 +96,16 @@
         {% endfor %}
         <input type="submit" value="Opt In">
       </form>
-    {% endif %}
-
+      {% endif %}
+    </div>
     {% else %}
-    <center><h1>Please login!</h1></center>
+    <center>
+      <h1>Please login!</h1>
+    </center>
+
     {% endif %}
-    {% endblock %}
+  </div>
+  {% endblock %}
   </div>
 </body>
 

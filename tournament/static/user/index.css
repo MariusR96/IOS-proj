@@ -3,3 +3,11 @@
     margin: 0;
     box-sizing: border-box;
   }
+
+
+  .form-css {
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 2px dashed #e1e1e1;
+  }
+  

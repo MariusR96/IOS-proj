@@ -1,10 +1,15 @@
 {% extends "tournament/index.html" %}
 {% block start %}
 
-<center>Tournament {{tournament.name}}</center>
-<p>Players in this tournament:</p>
-    {% for player in opted_in_players %}
-        <p>{{ player }}</p>
-    {% endfor %}
-    
+<center>
+    Tournament {{tournament.name}}
+</center></br>
+<div class="container sm-margin-top">
+    <div class="row text-center lg-margin-bottom">
+        <p>Players in this tournament:</p>
+        {% for player in opted_in_players %}
+            <p>{{ player }}</p>
+        {% endfor %}
+    </div>
+</div>   
 {% endblock %}

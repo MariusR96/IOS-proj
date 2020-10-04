@@ -1,14 +1,13 @@
+import pytz
+from datetime import datetime
 from rest_framework import viewsets, status
 from django.contrib.auth import login, authenticate
 from rest_framework.response import Response
-from rest_framework import generics
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view
 from django.contrib.auth.models import User
 from django.contrib.auth import login
+from django.contrib.sessions.models import Session
 from tournament.models import Player, Tournament, Game
-from django.contrib.auth.hashers import make_password
 from tournament.api.serializers import (
     PlayerSerializer,
     GameSerializer,
@@ -18,7 +17,6 @@ from tournament.api.serializers import (
 
 @api_view(['GET', ])
 def api_tournament_view(request, slug):
-
     try:
         tournament = Tournament.objects.get(slug=slug)
     except Tournament.DoesNotExist:
@@ -31,7 +29,6 @@ def api_tournament_view(request, slug):
 
 @api_view(['GET', ])
 def api_player_view(request, id):
-
     try:
         user = User.objects.get(pk=id)
     except User.DoesNotExist:
@@ -44,7 +41,6 @@ def api_player_view(request, id):
 
 @api_view(['GET', ])
 def api_game_view(request, slug):
-
     try:
         game = Game.objects.get(slug=slug)
     except Game.DoesNotExist:
@@ -57,7 +53,6 @@ def api_game_view(request, slug):
 
 @api_view(['POST',])
 def api_registration(request):
-
     if request.method == 'POST':
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
@@ -66,10 +61,7 @@ def api_registration(request):
             data_out['response'] = 'Successfully registered a new user.'
             data_out['email'] = user.email
             data_out['username'] = user.username
-            data_out['pass1'] = request.POST.get('password')
-            data_out['pass'] = make_password(request.POST.get('password'))
-            #token = Token.objects.get(user=user).key
-            #data_out['token'] = token
+            
         else:
             data_out = serializer.errors
 
@@ -77,12 +69,11 @@ def api_registration(request):
 
 
 @api_view(['POST', ])
-def login_veiw(request):
+def login_view(request):
     if request.method == 'POST':
         data_out = {}
         username = request.POST['username']
         password=request.POST['password']
-        
         user = authenticate(request, username=username,
                             password=password)
 
@@ -90,7 +81,7 @@ def login_veiw(request):
             login(request, user)                
             data_out['message'] = "Successfully logged in!"
             data_out['key'] = request.session.session_key
-            
+            data_out['id'] = user.id
         else:
             data_out['message'] = "User does not exist"
             
@@ -99,11 +90,18 @@ def login_veiw(request):
 
 @api_view(['GET',])
 def check_session(request, key):
-    print(request.session.keys())
     data_out = {}
-    if key == request.session.session_key:
-        data_out['is_active'] = True
-    else:
+    try:
+        session = Session.objects.get(pk=key)
+        time_now = datetime.utcnow().replace(tzinfo=pytz.utc)
+        session_expiry_time = session.expire_date
+        
+        if session_expiry_time > time_now:
+            data_out['is_active'] = True
+        else:
+            data_out['is_active'] = False
+
+    except Session.DoesNotExist:
         data_out['is_active'] = False
         
     return Response(data_out)
@@ -111,23 +109,32 @@ def check_session(request, key):
 
 @api_view(['POST', ])
 def opt_in_tournament(request):
-
-    player = User.objects.get(pk=request.POST['user_id']).player
-    tournament = Tournament.objects.get(slug=request.POST['tournament_slug'])
-    tournament.players.add(player)
     data_out = {}
-    data_out['message'] = f"Successfully added the player({player}) to the tournament({tournament.name})."
+    try:
+        player = User.objects.get(pk=request.POST['user_id']).player
+        tournament = Tournament.objects.get(slug=request.POST['tournament_slug'])
+        tournament.players.add(player)
+        data_out['message'] = f"Successfully added the player({player}) to the tournament({tournament.name})."
+    
+    except Player.DoesNotExist:
+        data_out['message'] = "Cannot fint player wit that id."
+    
+    except Tournament.DoesNotExist:
+        data_out['message'] = "Cannot find tournament with that slug."
 
     return Response(data_out)
 
 
 @api_view(['GET', ])
 def get_opted_in_players(request, tournament_slug):
+    data_out={}
+    try:
+        tournament = Tournament.objects.get(slug=tournament_slug)
+        players = tournament.players.all()
+        players_in_tournament = [str(player) for player in players]
+        data_out['players'] = players_in_tournament
 
-    tournament = Tournament.objects.get(slug=tournament_slug)
-    data_out = {}
-    players = tournament.players.all()
-    players_in_tournament = [str(player) for player in players]
-    data_out['players'] = players_in_tournament
+    except Tournament.DoesNotExist:
+        data_out['message'] = "Cannot find tournament with that slug."
 
     return Response(data_out)
