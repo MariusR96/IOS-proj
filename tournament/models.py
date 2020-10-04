@@ -40,9 +40,9 @@ class Tournament(models.Model):
 class Game(models.Model):
     name = name = models.CharField(max_length=50)
     slug = models.SlugField(unique=True, blank=True)
-    thumbnail = models.CharField(max_length=50)
+    thumbnail = models.CharField(max_length=50, blank=True)
     release_date = models.DateTimeField('Release Date')
-    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, blank=True)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
