@@ -11,7 +11,6 @@ from .forms import UserRegistrationForm
 
 def index(request):
     if request.user.is_authenticated:
-        print(request.session.session_key)
         tournaments = Tournament.objects.all()
         current_user = User.objects.get(pk=request.user.id)
         in_tournaments = []
@@ -27,6 +26,7 @@ def index(request):
                         'in_tournaments': in_tournaments,
                         'out_tournaments': out_tournaments})
     else: 
+
         return render(request, 'tournament/index.html', {'title': 'index'})
 
 
@@ -59,8 +59,8 @@ def login_view(request):
             return HttpResponseRedirect(reverse('tournament:index'))
         else:
             messages.info(request, f'Account does not exist.')
-
     form = AuthenticationForm()
+    
     return render(request, 'tournament/login.html', {'form': form,
                                 'title': 'Login'})
 
@@ -78,10 +78,11 @@ def check_session(request, key):
     
     return is_active
 
+
 def tournament_page(request, tournament_id):
     tournament = Tournament.objects.get(pk=tournament_id)
     players = opted_in_players(tournament.slug)
-    print(players)
+
     return render(request, 'tournament/tournament_page.html', {'title': 'Tournament',
                     'tournament': tournament,
                     'opted_in_players': players})
@@ -90,7 +91,6 @@ def tournament_page(request, tournament_id):
 def opt_in_tournaments(request):
     if request.method == 'POST':
         current_user = User.objects.get(pk=request.user.id)
-        print(current_user.player)
         for slug in request.POST.getlist('tournament'):
             opt_in(current_user.player, slug)
 
@@ -105,4 +105,5 @@ def opt_in(player, slug):
 
 def opted_in_players(slug):
     tournament = Tournament.objects.get(slug=slug)
+
     return tournament.players.all()
