@@ -3,9 +3,6 @@ FROM python:3.7-alpine
 ENV PYTHONUNBUFFERED 1
 
 
-# RUN apt-get update && apt-get install -qq -y \
-#   build-essential libpq-dev --no-install-recommends
-
 ENV INSTALL_PATH /app
 RUN mkdir -p $INSTALL_PATH
 
@@ -17,4 +14,4 @@ RUN pip install -r requirements.txt
 
 
 COPY . .
-# RUN pip install --editable .
+

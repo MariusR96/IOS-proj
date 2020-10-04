@@ -81,7 +81,6 @@ def login_view(request):
             login(request, user)                
             data_out['message'] = "Successfully logged in!"
             data_out['key'] = request.session.session_key
-            data_out['id'] = user.id
         else:
             data_out['message'] = "User does not exist"
             
